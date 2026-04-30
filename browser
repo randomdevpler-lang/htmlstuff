@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math and Reading Fun!</title>
+    <style>
+        /* Edge-like UI Styling */
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            background-color: #f3f3f3; 
+        }
+
+        /* Tab Bar Styling */
+        .tab-bar {
+            display: flex;
+            background-color: #dee1e6;
+            padding: 6px 6px 0 6px;
+            gap: 4px;
+            align-items: flex-end;
+        }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f3f3f3;
+            padding: 6px 12px;
+            border-radius: 8px 8px 0 0;
+            width: 200px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #444;
+            border: 1px solid transparent;
+            border-bottom: none;
+            transition: background-color 0.2s;
+        }
+
+        .tab:hover {
+            background-color: #e5e5e5;
+        }
+
+        .tab.active {
+            background-color: #ffffff;
+            color: #000;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
+            z-index: 2;
+        }
+
+        .tab-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            pointer-events: none;
+        }
+
+        .close-tab {
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .close-tab:hover {
+            background-color: #ccc;
+        }
+
+        .new-tab-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0 10px;
+            margin-bottom: 4px;
+            color: #555;
+            border-radius: 4px;
+        }
+
+        .new-tab-btn:hover {
+            background-color: #ccc;
+        }
+        
+        /* Toolbar Styling */
+        .toolbar { 
+            display: flex; 
+            padding: 8px 12px; 
+            background-color: #ffffff; 
+            border-bottom: 1px solid #ccc; 
+            align-items: center; 
+            gap: 8px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            z-index: 1;
+        }
+        
+        .nav-btn { 
+            background: none; 
+            border: 1px solid transparent; 
+            padding: 6px 12px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            color: #333;
+        }
+        
+        .nav-btn:hover { background-color: #e5e5e5; }
+        
+        .address-bar-container { 
+            display: flex; 
+            flex-grow: 1; 
+            align-items: center; 
+            background-color: #f0f0f0; 
+            border-radius: 20px; 
+            padding: 4px 16px; 
+            border: 1px solid transparent; 
+            transition: all 0.2s;
+        }
+        
+        .address-bar-container:focus-within { 
+            border-color: #0078d4; 
+            background-color: #fff; 
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2); 
+        }
+        
+        #url-input { 
+            border: none; 
+            background: transparent; 
+            flex-grow: 1; 
+            outline: none; 
+            font-size: 14px; 
+            padding: 4px; 
+        }
+        
+        #go-btn { 
+            background-color: #0078d4; 
+            color: white; 
+            border: none; 
+            padding: 6px 16px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 500;
+        }
+        
+        #go-btn:hover { background-color: #005a9e; }
+        
+        .bypass-container { 
+            display: flex; 
+            align-items: center; 
+            font-size: 13px; 
+            color: #444; 
+            background: #ffe8a1;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: help;
+        }
+
+        #iframes-container {
+            flex-grow: 1;
+            position: relative;
+        }
+        
+        iframe { 
+            border: none; 
+            width: 100%; 
+            height: 100%;
+            background-color: #fff; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none; 
+        }
+
+        iframe.active {
+            display: block; 
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="tab-bar">
+        <button class="new-tab-btn" onclick="createNewTab()" title="New Tab">+</button>
+    </div>
+
+    <div class="toolbar">
+        <button class="nav-btn" onclick="goBack()" title="Back">⮜</button>
+        <button class="nav-btn" onclick="goForward()" title="Forward">⮞</button>
+        <button class="nav-btn" onclick="refresh()" title="Refresh">⟳</button>
+        
+        <div class="address-bar-container">
+            <input type="text" id="url-input" placeholder="Search Bing or enter web address" onkeypress="handleKeyPress(event)">
+        </div>
+        <button id="go-btn" onclick="loadUrl()">Go</button>
+        
+        <div class="bypass-container" title="Check this if the website refuses to load (bypasses iframe restrictions via proxy)">
+            <input type="checkbox" id="bypass-toggle">
+            <label for="bypass-toggle">Bypass Mode</label>
+        </div>
+    </div>
+
+    <div id="iframes-container"></div>
+
+    <script>
+        const input = document.getElementById('url-input');
+        const bypassToggle = document.getElementById('bypass-toggle');
+        const tabBar = document.querySelector('.tab-bar');
+        const newTabBtn = document.querySelector('.new-tab-btn');
+        const iframesContainer = document.getElementById('iframes-container');
+        
+        const proxyUrl = 'https://corsproxy.io/?'; 
+        const searchEngineUrl = 'https://www.bing.com/search?q=';
+        
+        let tabCounter = 0;
+        let activeTabId = null;
+
+        createNewTab();
+
+        function createNewTab() {
+            tabCounter++;
+            const tabId = 'tab-' + tabCounter;
+
+            const tabEl = document.createElement('div');
+            tabEl.className = 'tab';
+            tabEl.id = 'ui-' + tabId;
+            tabEl.onclick = () => switchTab(tabId);
+            tabEl.innerHTML = `
+                <span class="tab-title">New Tab</span>
+                <button class="close-tab" onclick="closeTab('${tabId}', event)">×</button>
+            `;
+            
+            tabBar.insertBefore(tabEl, newTabBtn);
+
+            const iframeEl = document.createElement('iframe');
+            iframeEl.id = 'frame-' + tabId;
+            iframeEl.src = 'about:blank';
+            iframeEl.dataset.currentUrl = ''; 
+            
+            iframesContainer.appendChild(iframeEl);
+            switchTab(tabId);
+        }
+
+        function switchTab(tabId) {
+            activeTabId = tabId;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('ui-' + tabId).classList.add('active');
+
+            document.querySelectorAll('iframe').forEach(f => f.classList.remove('active'));
+            const activeFrame = document.getElementById('frame-' + tabId);
+            activeFrame.classList.add('active');
+
+            input.value = activeFrame.dataset.currentUrl || '';
+        }
+
+        function closeTab(tabId, event) {
+            event.stopPropagation(); 
+            const tabEl = document.getElementById('ui-' + tabId);
+            const frameEl = document.getElementById('frame-' + tabId);
+            tabEl.remove();
+            frameEl.remove();
+
+            if (activeTabId === tabId) {
+                const remainingTabs = document.querySelectorAll('.tab');
+                if (remainingTabs.length > 0) {
+                    const lastTabId = remainingTabs[remainingTabs.length - 1].id.replace('ui-', '');
+                    switchTab(lastTabId);
+                } else {
+                    activeTabId = null;
+                    input.value = '';
+                    createNewTab();
+                }
+            }
+        }
+
+        function loadUrl() {
+            if (!activeTabId) return;
+
+            let userInput = input.value.trim();
+            if (!userInput) return;
+
+            let finalUrl = '';
+
+            // Check if it starts with http/https
+            const hasProtocol = /^https?:\/\//i.test(userInput);
+            // Check if it looks like a domain (e.g., "example.com", "sub.site.org")
+            const isDomain = /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(userInput);
+
+            if (hasProtocol) {
+                finalUrl = userInput;
+            } else if (isDomain) {
+                // If it looks like a domain but lacks protocol, add https
+                finalUrl = 'https://' + userInput;
+            } else {
+                // Otherwise, treat it as a search query for Bing
+                finalUrl = searchEngineUrl + encodeURIComponent(userInput);
+            }
+
+            const activeFrame = document.getElementById('frame-' + activeTabId);
+            const activeTabUI = document.getElementById('ui-' + activeTabId).querySelector('.tab-title');
+
+            // Update UI
+            activeFrame.dataset.currentUrl = userInput;
+            activeTabUI.textContent = userInput;
+            input.value = userInput;
+
+            // Apply bypass proxy if checked
+            if (bypassToggle.checked) {
+                activeFrame.src = proxyUrl + encodeURIComponent(finalUrl);
+            } else {
+                activeFrame.src = finalUrl;
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') loadUrl();
+        }
+
+        function refresh() {
+            loadUrl();
+        }
+
+        function goBack() {
+            if (!activeTabId) return;
+            try {
+                document.getElementById('frame-' + activeTabId).contentWindow.history.back();
+            } catch(e) {
+                alert("Security policy prevents accessing history on this site.");
+            }
+        }
+
+        function goForward() {
+            if (!activeTabId) return;
+            try {
+                document.getElementById('frame-' + activeTabId).contentWindow.history.forward();
+            } catch(e) {
+                alert("Security policy prevents accessing history on this site.");
+            }
+        }
+    </script>
+</body>
+</html>
