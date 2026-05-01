@@ -1,0 +1,81 @@
+1. Prerequisites
+You will need to install Node.js on your computer first. You can get it at nodejs.org.
+
+2. The Setup
+Create a new folder for your project and create these three files inside it:
+
+File 1: package.json
+This tells Node.js what your app is and what it needs to run.
+
+-- CODE STARTS HERE
+{
+  "name": "cheat-browser",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^28.0.0"
+  }
+}
+
+-- ENDS HERE 
+
+File 2: main.js (The Brain)
+This is the file that creates the window. Notice the webSecurity: false line—that is the magic switch that makes Blooket cheats and scripts work.
+
+-- CODE STARTS HERE
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      // THIS IS THE KEY: It disables the security that blocks your scripts
+      webSecurity: false 
+    }
+  });
+
+  // This loads your existing HTML browser file
+  win.loadFile('index.html');
+}
+
+app.whenReady().then(createWindow);
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+-- ends here 
+
+File 3: index.html (Your Browser UI)
+You can use the full script I gave you earlier, but with one huge change: you can now remove the "Bypass Mode" logic and change the applyCustomCSS function to be much more powerful.
+
+In your <script> tag inside index.html, update the function to this:
+
+-- STARTS HERE 
+
+function applyCustomCSS() {
+    const cssCode = document.getElementById('css-input').value;
+    const activeFrame = document.getElementById('frame-' + activeTabId);
+    
+    // In Electron with webSecurity: false, this will NEVER fail.
+    const style = activeFrame.contentDocument.createElement('style');
+    style.innerHTML = cssCode;
+    activeFrame.contentDocument.head.appendChild(style);
+}
+
+-- ENDS HERE
+
+. How to Run It
+Open your terminal or command prompt.
+
+Navigate to your folder (cd path/to/folder).
+
+Type npm install (this downloads the Electron engine).
+
+Type npm start.
