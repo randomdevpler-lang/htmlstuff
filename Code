@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>| Coolico.Client |</title>
+    <style>
+        /* CSS Variable Architecture for Live Theme Switching */
+        :root {
+            --bg-color: #050508;
+            --sidebar-bg: rgba(15, 15, 25, 0.6);
+            --panel-bg: rgba(10, 10, 15, 0.4);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-color: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --accent-color: #aec6cf;
+            --btn-hover: rgba(255, 255, 255, 0.1);
+            --chat-ai-bg: rgba(230, 92, 0, 0.1);
+            --chat-ai-border: rgba(230, 92, 0, 0.2);
+            --canvas-opacity: 0.4;
+        }
+
+        /* Matrix Theme Overrides */
+        [data-theme="matrix"] {
+            --bg-color: #000902;
+            --sidebar-bg: rgba(0, 20, 5, 0.7);
+            --panel-bg: rgba(0, 10, 2, 0.5);
+            --border-color: rgba(0, 255, 70, 0.2);
+            --text-color: #00ff41;
+            --text-muted: rgba(0, 255, 65, 0.6);
+            --accent-color: #00ff66;
+            --btn-hover: rgba(0, 255, 65, 0.15);
+            --chat-ai-bg: rgba(0, 255, 65, 0.08);
+            --chat-ai-border: rgba(0, 255, 65, 0.3);
+            --canvas-opacity: 0.6;
+        }
+
+        /* Cyber Crimson Overrides */
+        [data-theme="crimson"] {
+            --bg-color: #0a0104;
+            --sidebar-bg: rgba(25, 5, 10, 0.6);
+            --panel-bg: rgba(15, 5, 8, 0.4);
+            --border-color: rgba(255, 0, 55, 0.15);
+            --text-color: #ffb3c1;
+            --text-muted: rgba(255, 179, 193, 0.5);
+            --accent-color: #ff0055;
+            --btn-hover: rgba(255, 0, 85, 0.1);
+            --chat-ai-bg: rgba(255, 0, 85, 0.08);
+            --chat-ai-border: rgba(255, 0, 85, 0.25);
+            --canvas-opacity: 0.35;
+        }
+
+/* Cyber Yellow Theme Overrides */
+[data-theme="yellow"] {
+    --bg-color: #0c0a00;
+    --sidebar-bg: rgba(25, 22, 0, 0.65);
+    --panel-bg: rgba(15, 13, 0, 0.45);
+    --border-color: rgba(255, 234, 0, 0.2);
+    --text-color: #fff3a8;
+    --text-muted: rgba(255, 243, 168, 0.5);
+    --accent-color: #ffea00;
+    --btn-hover: rgba(255, 234, 0, 0.15);
+    --chat-ai-bg: rgba(255, 234, 0, 0.08);
+    --chat-ai-border: rgba(255, 234, 0, 0.25);
+    --canvas-opacity: 0.5;
+}
+        /* Clean Light Mode Overrides */
+        [data-theme="light"] {
+            --bg-color: #f4f5f8;
+            --sidebar-bg: rgba(235, 237, 243, 0.8);
+            --panel-bg: rgba(255, 255, 255, 0.9);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --text-color: #1e2229;
+            --text-muted: #5c6470;
+            --accent-color: #3b82f6;
+            --btn-hover: rgba(0, 0, 0, 0.05);
+            --chat-ai-bg: rgba(59, 130, 246, 0.08);
+            --chat-ai-border: rgba(59, 130, 246, 0.2);
+            --canvas-opacity: 0.15;
+        }
+
+        /* Reset and Base Layout Setup */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        #plexusCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .app-container {
+            position: relative;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        /* Sidebar Architecture */
+        .sidebar {
+            width: 280px;
+            height: 100%;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            justify-content: space-between;
+        }
+
+        .sidebar-top h2 {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--text-color);
+        }
+
+        .nav-btn {
+            display: block;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 14px 20px;
+            margin-bottom: 15px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            outline: none;
+        }
+
+        .nav-btn:hover {
+            background: var(--btn-hover);
+            color: var(--text-color);
+            transform: translateX(4px);
+        }
+
+        .nav-btn.active {
+            background: var(--btn-hover);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .sidebar-bottom {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        /* Views Window Framework */
+        .main-content {
+            flex: 1;
+            height: 100%;
+            padding: 30px;
+            display: flex;
+        }
+
+        .panel {
+            display: none; /* Stays hidden by default on script initialization */
+            width: 100%;
+            height: 100%;
+            background: var(--panel-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .panel.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        h3 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            color: var(--text-color);
+        }
+
+        /* Dynamic Grid Layouts */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .site-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .site-card:hover {
+            background: var(--btn-hover);
+            transform: translateY(-2px);
+        }
+
+        .delete-card-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 0, 0, 0.15);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff4d4d;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: none; /* Handled programmatically via Settings */
+        }
+
+        .editing .delete-card-btn {
+            display: block;
+        }
+
+        /* Sandbox & Layout Splits */
+        .workspace-split {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .browser-container {
+            flex: 7;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #111116;
+        }
+
+        .browser-toolbar {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .url-input {
+            flex: 1;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .toolbar-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .toolbar-btn:hover { background: var(--btn-hover); }
+        .browser-frame { flex: 1; width: 100%; background: #fff; border: none; }
+        .console-container { flex: 3; display: flex; flex-direction: column; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; }
+        .code-area { flex: 1; width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #00ff66; font-family: monospace; padding: 12px; border-radius: 6px; margin: 10px 0; resize: none; }
+
+        /* Configuration Forms (Settings Panel) */
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            overflow-y: auto;
+        }
+
+        .settings-box {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .theme-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .theme-dot:hover { transform: scale(1.1); }
+        .theme-dot.active { border-color: var(--text-color); }
+
+        .form-input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            outline: none;
+        }
+
+        /* GPT Component UI */
+        .chat-container { display: flex; flex-direction: column; width: 100%; height: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .chat-header { background: rgba(0,0,0,0.2); padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .status-dot { width: 8px; height: 8px; background: #e0a800; border-radius: 50%; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .message { display: flex; flex-direction: column; max-width: 85%; padding: 12px 16px; border-radius: 12px; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
+        .message.user { background: rgba(255, 255, 255, 0.08); align-self: flex-end; color: #fff; border-bottom-right-radius: 2px; }
+        .message.ai { background: var(--chat-ai-bg); border: 1px solid var(--chat-ai-border); align-self: flex-start; color: var(--text-color); border-bottom-left-radius: 2px; }
+        .chat-input-bar { padding: 15px 20px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border-color); display: flex; gap: 10px; }
+        .chat-input { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 12px; border-radius: 6px; outline: none; }
+    </style>
+</head>
+<body>
+
+    <canvas id="plexusCanvas"></canvas>
+
+    <div class="app-container">
+        
+        <nav class="sidebar">
+            <div class="sidebar-top">
+                <h2>𝙘𝙤𝙤𝙡𝙞𝙘𝙤.𝙘𝙡𝙞𝙚𝙣𝙩</h2>
+                <button class="nav-btn" id="btn-websites" onclick="switchTab('tab-websites')">Websites</button>
+                <button class="nav-btn" id="btn-opener" onclick="switchTab('tab-opener')">Fake Browser</button>
+                <button class="nav-btn" id="btn-chat" onclick="switchTab('tab-chat')">CoolicoGPT</button>
+            </div>
+            
+            <div class="sidebar-bottom">
+                <button class="nav-btn" id="btn-settings" onclick="switchTab('tab-settings')" style="margin-bottom:0; background:rgba(255,255,255,0.05)">⚙️ Settings</button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            
+            <div id="tab-websites" class="panel">
+                <h3 id="directoryHeading">Resource Directory</h3>
+                <div class="card-grid" id="directoryGrid">
+                    </div>
+            </div>
+
+            <div id="tab-opener" class="panel">
+                <div class="workspace-split">
+                    <div class="browser-container">
+                        <div class="browser-toolbar">
+                            <input type="text" id="urlInput" class="url-input" value="https://poki.com" onkeydown="if(event.key === 'Enter') navigateFrame()">
+                            <button class="toolbar-btn" onclick="navigateFrame()">Launch Window</button>
+                        </div>
+                        <iframe id="sandboxFrame" class="browser-frame" src="about:blank"></iframe>
+                    </div>
+
+                    <div class="console-container">
+                        <h4 style="font-size:0.95rem;">Code Injector</h4>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Inject code frames directly into the responsive layout structure matrix.</p>
+                        <textarea id="jsPayload" class="code-area" placeholder="// Input your custom JavaScript here..."></textarea>
+                        <button class="toolbar-btn" style="width: 100%; background: rgba(0, 255, 102, 0.1); border-color: rgba(0, 255, 102, 0.3);" onclick="executeInjectedScript()">
+                            Execute Script
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-chat" class="panel">
+                <h3>CoolicoGPT</h3>
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div class="status-dot" id="chatStatus"></div>
+                            <span style="font-weight: 500; font-size: 0.95rem;" id="chatTitle">Groq Simulator Loaded</span>
+                        </div>
+                        
+                        <div class="key-config-box">
+                            <input type="password" id="keyField" class="key-box-input" placeholder="Paste Groq Key (gsk_...)">
+                            <button class="toolbar-btn" style="padding: 4px 8px; font-size: 0.75rem;" onclick="commitApiKey()">Save Key</button>
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai" id="welcomeMsg">Hello! Configuration engine setup complete. Supply an API authentication key token above to run active cloud inferences.</div>
+                    </div>
+                    <div class="chat-input-bar">
+                        <input type="text" id="chatInput" class="chat-input" placeholder="Ask Groq something..." onkeydown="if(event.key === 'Enter') sendChatMessage()">
+                        <button class="toolbar-btn" style="background: #e65c00; border:none;" id="sendBtn" onclick="sendChatMessage()">Transmit</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-settings" class="panel">
+                <h3>Configuration Settings</h3>
+                <div class="settings-layout">
+                    
+                    <div class="settings-box">
+                        <h4>Themes</h4>
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Swap your layout color profiles instantly.</p>
+                        <div class="theme-selector">
+                            <div class="theme-dot active" style="background:#050508; border:1px solid #fff;" onclick="selectTheme('default', this)" title="Deep Cosmic"></div>
+                            <div class="theme-dot" style="background:#000000; border:1px solid #ffea00;" onclick="selectTheme('light', this)" title="Coolico Yellow"></div>
+                            <div class="theme-dot" style="background:#000902; border:1px solid #00ff41;" onclick="selectTheme('matrix', this)" title="Matrix Grid"></div>
+                            <div class="theme-dot" style="background:#0a0104; border:1px solid #ff0055;" onclick="selectTheme('crimson', this)" title="Cyber Crimson"></div>
+                            <div class="theme-dot" style="background:#f4f5f8; border:1px solid #1e2229;" onclick="selectTheme('light', this)" title="Light Workspace"></div>
+                        </div>
+                    </div>
+
+                    <div class="settings-box">
+                        <h4>Add Websites</h4>
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Inject custom portals or clear index components dynamically.</p>
+                        
+                        <input type="text" id="newSiteTitle" class="form-input" placeholder="Website Name">
+                        <input type="text" id="newSiteUrl" class="form-input" placeholder="URL Target">
+                        <input type="text" id="newSiteDesc" class="form-input" placeholder="Descripton (Optional)">
+                        
+                        <div style="margin-top: 15px; display:flex; gap:10px;">
+                            <button class="toolbar-btn" style="background:rgba(0,255,102,0.15); border-color:rgba(0,255,102,0.3)" onclick="addCustomDirectoryCard()">
+                                + Append Portal Shortcut
+                            </button>
+                            <button class="toolbar-btn" id="toggleEditBtn" style="background:rgba(255,255,255,0.05)" onclick="toggleEditDirectoryMode()">
+                                Edit Layout List
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // --- 1. INITIAL DIRECTORY DATA ARRAYS ---
+        const baselineDirectories = [
+            { title: "Poki Games 🎮", url: "https://poki.com", desc: "Launch the standard web-native game library frame directory directly here." },
+            { title: "Wikipedia", url: "https://www.wikipedia.org", desc: "Open encyclopedia containing millions of reference documents." },
+            { title: "Project Gutenberg", url: "https://www.gutenberg.org", desc: "An archive library of over 70,000 free digital open books." },
+            { title: "Internet Archive", url: "https://archive.org", desc: "Massive public backup indexing millions of legacy files." }
+        ];
+
+        let dynamicDirectory = JSON.parse(localStorage.getItem('user_custom_directory_cards')) || baselineDirectories;
+        let isEditingMode = false;
+
+        // --- 2. CANVAS INTERACTIVE BACKGROUND MODULE ---
+        const canvas = document.getElementById('plexusCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const maxDistance = 120;
+        const particleCount = 50;
+
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5; this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                let opacityValue = getComputedStyle(document.documentElement).getPropertyValue('--canvas-opacity').trim() || 0.4;
+                ctx.fillStyle = `rgba(255, 255, 255, ${opacityValue})`; ctx.fill();
+            }
+        }
+        for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            let opacityValue = getComputedStyle(document.documentElement).getPropertyValue('--canvas-opacity').trim() || 0.4;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < maxDistance) {
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${(1 - dist / maxDistance) * opacityValue * 0.4})`;
+                        ctx.lineWidth = 0.8; ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- 3. DYNAMIC TAB INTERFACE MANAGEMENT ---
+        // Stays completely empty at load time, hiding all content panes natively!
+        function switchTab(tabId) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            const activePanel = document.getElementById(tabId);
+            activePanel.classList.add('active');
+            
+            // Map corresponding visual sidebar button highlighting anchors
+            if (tabId === 'tab-websites') document.getElementById('btn-websites').classList.add('active');
+            if (tabId === 'tab-opener') document.getElementById('btn-opener').classList.add('active');
+            if (tabId === 'tab-chat') document.getElementById('btn-chat').classList.add('active');
+            if (tabId === 'tab-settings') document.getElementById('btn-settings').classList.add('active');
+        }
+
+        // --- 4. BROWSER SANDBOX RUNTIME MOTORS (EDGE INTEGRATION) ---
+        function navigateFrame() {
+            let input = document.getElementById('urlInput').value.trim();
+            const frame = document.getElementById('sandboxFrame');
+            if (!input) return;
+
+            const urlPattern = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-./?%&=]*)?$/i;
+
+            if (urlPattern.test(input)) {
+                if (!/^https?:\/\//i.test(input)) input = 'https://' + input;
+                frame.src = input;
+                document.getElementById('urlInput').value = input;
+            } else {
+                // Route query strings straight through Microsoft Edge (Bing search parsing structures)
+                const searchQuery = encodeURIComponent(input);
+                frame.src = `https://www.bing.com/search?q=${searchQuery}`;
+            }
+        }
+
+        function loadExternal(url) {
+            document.getElementById('urlInput').value = url;
+            switchTab('tab-opener');
+            navigateFrame();
+        }
+
+        function executeInjectedScript() {
+            try { document.getElementById('sandboxFrame').contentWindow.eval(document.getElementById('jsPayload').value); }
+            catch (err) { alert("Frame Origin Isolation Active. Details: " + err.message); }
+        }
+
+        // --- 5. THEME SWITCH ENGINE ---
+        let ActiveTheme = localStorage.getItem('user_workspace_palette_theme') || 'default';
+        if (ActiveTheme !== 'default') {
+            document.documentElement.setAttribute('data-theme', ActiveTheme);
+            // Re-match theme dots state highlighting on boot
+            setTimeout(() => {
+                const dots = document.querySelectorAll('.theme-dot');
+                dots.forEach(d => d.classList.remove('active'));
+                if(ActiveTheme === 'matrix') dots[1].classList.add('active');
+                if(ActiveTheme === 'crimson') dots[2].classList.add('active');
+                if(ActiveTheme === 'light') dots[3].classList.add('active');
+            }, 100);
+        }
+
+        function selectTheme(themeName, element) {
+            document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+            element.classList.add('active');
+            if (themeName === 'default') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', themeName);
+            }
+            localStorage.setItem('user_workspace_palette_theme', themeName);
+        }
+
+        // --- 6. DIRECTORY STORAGE CONTROLLERS ---
+        function renderDirectoryGrid() {
+            const grid = document.getElementById('directoryGrid');
+            grid.innerHTML = '';
+
+            dynamicDirectory.forEach((site, index) => {
+                const card = document.createElement('div');
+                card.className = 'site-card';
+                // Only load link context if editing deletions are closed
+                card.setAttribute('onclick', `if(!isEditingMode) loadExternal('${site.url}')`);
+
+                card.innerHTML = `
+                    <button class="delete-card-btn" onclick="event.stopPropagation(); removeDirectoryCard(${index})">Delete</button>
+                    <h4 style="color: var(--accent-color); margin-bottom: 5px;">${site.title}</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); line-height:1.4;">${site.desc}</p>
+                `;
+                grid.appendChild(card);
+            });
+
+            const panel = document.getElementById('tab-websites');
+            if(isEditingMode) {
+                panel.classList.add('editing');
+            } else {
+                panel.classList.remove('editing');
+            }
+        }
+        renderDirectoryGrid(); // Run inventory loader on startup parameters
+
+        function addCustomDirectoryCard() {
+            const titleInput = document.getElementById('newSiteTitle');
+            const urlInput = document.getElementById('newSiteUrl');
+            const descInput = document.getElementById('newSiteDesc');
+
+            let title = titleInput.value.trim();
+            let url = urlInput.value.trim();
+            let desc = descInput.value.trim() || 'Custom linked web workspace asset configuration resource.';
+
+            if(!title || !url) {
+                alert("Please declare both a shorthand reference Name and a target URL destination pathway.");
+                return;
+            }
+
+            if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+            dynamicDirectory.push({ title: title, url: url, desc: desc });
+            localStorage.setItem('user_custom_directory_cards', JSON.stringify(dynamicDirectory));
+            
+            // Clean interface text values
+            titleInput.value = ''; urlInput.value = ''; descInput.value = '';
+            renderDirectoryGrid();
+            alert(`"${title}" appended successfully inside persistent records data logs.`);
+        }
+
+        function removeDirectoryCard(index) {
+            dynamicDirectory.splice(index, 1);
+            localStorage.setItem('user_custom_directory_cards', JSON.stringify(dynamicDirectory));
+            renderDirectoryGrid();
+        }
+
+        function toggleEditDirectoryMode() {
+            isEditingMode = !isEditingMode;
+            const btn = document.getElementById('toggleEditBtn');
+            if(isEditingMode) {
+                btn.textContent = "Exit Edit Mode";
+                btn.style.background = "rgba(255,77,77,0.15)";
+                document.getElementById('directoryHeading').textContent = "Modify Resource Index (Click Delete to Drop)";
+                switchTab('tab-websites'); // View mutations in real-time
+            } else {
+                btn.textContent = "Edit Layout List";
+                btn.style.background = "rgba(255,255,255,0.05)";
+                document.getElementById('directoryHeading').textContent = "Resource Directory";
+            }
+            renderDirectoryGrid();
+        }
+
+        // --- 7. GROQ BACKEND CHAT HANDLERS ---
+        let GROQ_API_KEY = localStorage.getItem('user_secure_groq_key') || '';
+
+        function updateUiState() {
+            const statusDot = document.getElementById('chatStatus');
+            const chatTitle = document.getElementById('chatTitle');
+            const sendBtn = document.getElementById('sendBtn');
+            const welcomeMsg = document.getElementById('welcomeMsg');
+
+            if(GROQ_API_KEY) {
+                statusDot.style.background = '#10a37f';
+                chatTitle.textContent = 'Groq Engine Ready';
+                sendBtn.style.background = '#10a37f';
+                document.getElementById('keyField').value = GROQ_API_KEY;
+                welcomeMsg.textContent = "System Connected! Token locked in browser storage. Drop a query message block below.";
+            } else {
+                statusDot.style.background = '#e0a800';
+                chatTitle.textContent = 'Groq Simulator Sandbox';
+                sendBtn.style.background = '#e65c00';
+            }
+        }
+        updateUiState();
+
+        function commitApiKey() {
+            const incomingValue = document.getElementById('keyField').value.trim();
+            if(!incomingValue) {
+                localStorage.removeItem('user_secure_groq_key');
+                GROQ_API_KEY = '';
+                alert("Key parameters released. Toggling backup simulators.");
+            } else {
+                localStorage.setItem('user_secure_groq_key', incomingValue);
+                GROQ_API_KEY = incomingValue;
+                alert("API authentication keys cached to browser environment variables successfully!");
+            }
+            updateUiState();
+        }
+
+        async function sendChatMessage() {
+            const inputField = document.getElementById('chatInput');
+            const userText = inputField.value.trim();
+            if (!userText) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user';
+            userDiv.textContent = userText;
+            chatMessages.appendChild(userDiv);
+
+            inputField.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'message ai';
+            if(GROQ_API_KEY) aiDiv.classList.add('live');
+            aiDiv.textContent = "Processing remote inference call arrays...";
+            chatMessages.appendChild(aiDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            if (GROQ_API_KEY) {
+                try {
+                    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${GROQ_API_KEY}`
+                        },
+                        body: JSON.stringify({
+                            model: "llama-3.3-70b-versatile",
+                            messages: [{ role: "user", content: userText }]
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (response.ok && data.choices && data.choices[0]) {
+                        aiDiv.textContent = data.choices[0].message.content;
+                    } else {
+                        const serverErrorMessage = data.error ? data.error.message : 'Unknown response headers.';
+                        aiDiv.textContent = `Groq Server Rejected Connection:\n--> "${serverErrorMessage}"`;
+                    }
+                } catch (error) {
+                    aiDiv.textContent = "Browser Security Block (CORS Error):\nLocal files opened via file:/// protocols cannot request cloud APIs safely.\n\nFix: Fire up this code inside a quick development host layer (like the 'Live Server' add-on in VS Code).";
+                    console.error(error);
+                }
+            } else {
+                setTimeout(() => {
+                    aiDiv.textContent = "Sandbox Mode active. Feed a dynamic Groq deployment token above to use real-time generations.";
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 500);
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+</html>
