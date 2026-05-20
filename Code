@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>| Coolico.Client |</title>
+    <title>| coolico.client |</title>
     <style>
         /* CSS Variable Architecture for Live Theme Switching */
         :root {
@@ -50,20 +50,21 @@
             --canvas-opacity: 0.35;
         }
 
-/* Cyber Yellow Theme Overrides */
-[data-theme="yellow"] {
-    --bg-color: #0c0a00;
-    --sidebar-bg: rgba(25, 22, 0, 0.65);
-    --panel-bg: rgba(15, 13, 0, 0.45);
-    --border-color: rgba(255, 234, 0, 0.2);
-    --text-color: #fff3a8;
-    --text-muted: rgba(255, 243, 168, 0.5);
-    --accent-color: #ffea00;
-    --btn-hover: rgba(255, 234, 0, 0.15);
-    --chat-ai-bg: rgba(255, 234, 0, 0.08);
-    --chat-ai-border: rgba(255, 234, 0, 0.25);
-    --canvas-opacity: 0.5;
-}
+        /* Cyber Yellow Theme Overrides */
+        [data-theme="yellow"] {
+            --bg-color: #0c0a00;
+            --sidebar-bg: rgba(25, 22, 0, 0.65);
+            --panel-bg: rgba(15, 13, 0, 0.45);
+            --border-color: rgba(255, 234, 0, 0.2);
+            --text-color: #fff3a8;
+            --text-muted: rgba(255, 243, 168, 0.5);
+            --accent-color: #ffea00;
+            --btn-hover: rgba(255, 234, 0, 0.15);
+            --chat-ai-bg: rgba(255, 234, 0, 0.08);
+            --chat-ai-border: rgba(255, 234, 0, 0.25);
+            --canvas-opacity: 0.5;
+        }
+
         /* Clean Light Mode Overrides */
         [data-theme="light"] {
             --bg-color: #f4f5f8;
@@ -178,7 +179,7 @@
         }
 
         .panel {
-            display: none; /* Stays hidden by default on script initialization */
+            display: none; /* Hidden by default on startup initialization */
             width: 100%;
             height: 100%;
             background: var(--panel-bg);
@@ -234,7 +235,7 @@
             padding: 2px 6px;
             font-size: 0.7rem;
             cursor: pointer;
-            display: none; /* Handled programmatically via Settings */
+            display: none;
         }
 
         .editing .delete-card-btn {
@@ -343,6 +344,8 @@
         .chat-container { display: flex; flex-direction: column; width: 100%; height: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
         .chat-header { background: rgba(0,0,0,0.2); padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
         .status-dot { width: 8px; height: 8px; background: #e0a800; border-radius: 50%; }
+        .key-config-box { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
+        .key-box-input { background: transparent; border: none; color: #fff; font-size: 0.8rem; outline: none; width: 160px; }
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
         .message { display: flex; flex-direction: column; max-width: 85%; padding: 12px 16px; border-radius: 12px; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
         .message.user { background: rgba(255, 255, 255, 0.08); align-self: flex-end; color: #fff; border-bottom-right-radius: 2px; }
@@ -359,9 +362,9 @@
         
         <nav class="sidebar">
             <div class="sidebar-top">
-                <h2>𝙘𝙤𝙤𝙡𝙞𝙘𝙤.𝙘𝙡𝙞𝙚𝙣𝙩</h2>
+                <h2>coolico.client</h2>
                 <button class="nav-btn" id="btn-websites" onclick="switchTab('tab-websites')">Websites</button>
-                <button class="nav-btn" id="btn-opener" onclick="switchTab('tab-opener')">Fake Browser</button>
+                <button class="nav-btn" id="btn-opener" onclick="switchTab('tab-opener')">Web Sandbox</button>
                 <button class="nav-btn" id="btn-chat" onclick="switchTab('tab-chat')">CoolicoGPT</button>
             </div>
             
@@ -424,7 +427,7 @@
             </div>
 
             <div id="tab-settings" class="panel">
-                <h3>Configuration Settings</h3>
+                <h3>Configuration</h3>
                 <div class="settings-layout">
                     
                     <div class="settings-box">
@@ -432,20 +435,20 @@
                         <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Swap your layout color profiles instantly.</p>
                         <div class="theme-selector">
                             <div class="theme-dot active" style="background:#050508; border:1px solid #fff;" onclick="selectTheme('default', this)" title="Deep Cosmic"></div>
-                            <div class="theme-dot" style="background:#000000; border:1px solid #ffea00;" onclick="selectTheme('light', this)" title="Coolico Yellow"></div>
                             <div class="theme-dot" style="background:#000902; border:1px solid #00ff41;" onclick="selectTheme('matrix', this)" title="Matrix Grid"></div>
                             <div class="theme-dot" style="background:#0a0104; border:1px solid #ff0055;" onclick="selectTheme('crimson', this)" title="Cyber Crimson"></div>
+                            <div class="theme-dot" style="background:#1a1800; border:1px solid #ffea00;" onclick="selectTheme('yellow', this)" title="Cyber Yellow"></div>
                             <div class="theme-dot" style="background:#f4f5f8; border:1px solid #1e2229;" onclick="selectTheme('light', this)" title="Light Workspace"></div>
                         </div>
                     </div>
 
                     <div class="settings-box">
-                        <h4>Add Websites</h4>
+                        <h4>Manage Resource Links</h4>
                         <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Inject custom portals or clear index components dynamically.</p>
                         
-                        <input type="text" id="newSiteTitle" class="form-input" placeholder="Website Name">
-                        <input type="text" id="newSiteUrl" class="form-input" placeholder="URL Target">
-                        <input type="text" id="newSiteDesc" class="form-input" placeholder="Descripton (Optional)">
+                        <input type="text" id="newSiteTitle" class="form-input" placeholder="Website Name (e.g., Poki Games)">
+                        <input type="text" id="newSiteUrl" class="form-input" placeholder="URL Target Directory (e.g., poki.com)">
+                        <input type="text" id="newSiteDesc" class="form-input" placeholder="Brief Summary Descriptor text...">
                         
                         <div style="margin-top: 15px; display:flex; gap:10px;">
                             <button class="toolbar-btn" style="background:rgba(0,255,102,0.15); border-color:rgba(0,255,102,0.3)" onclick="addCustomDirectoryCard()">
@@ -526,20 +529,28 @@
         }
         animate();
 
-        // --- 3. DYNAMIC TAB INTERFACE MANAGEMENT ---
-        // Stays completely empty at load time, hiding all content panes natively!
+        // --- 3. DYNAMIC TAB INTERFACE MANAGEMENT (WITH DOUBLE-CLICK TOGGLE TO CLOSE) ---
         function switchTab(tabId) {
+            const targetPanel = document.getElementById(tabId);
+            const targetButton = document.getElementById(
+                tabId === 'tab-websites' ? 'btn-websites' :
+                tabId === 'tab-opener' ? 'btn-opener' :
+                tabId === 'tab-chat' ? 'btn-chat' : 'btn-settings'
+            );
+
+            // If the clicked panel is already active, turn it off completely (Toggle away)
+            if (targetPanel.classList.contains('active')) {
+                targetPanel.classList.remove('active');
+                if (targetButton) targetButton.classList.remove('active');
+                return;
+            }
+
+            // Otherwise, clear old views and load the target selection cleanly
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             
-            const activePanel = document.getElementById(tabId);
-            activePanel.classList.add('active');
-            
-            // Map corresponding visual sidebar button highlighting anchors
-            if (tabId === 'tab-websites') document.getElementById('btn-websites').classList.add('active');
-            if (tabId === 'tab-opener') document.getElementById('btn-opener').classList.add('active');
-            if (tabId === 'tab-chat') document.getElementById('btn-chat').classList.add('active');
-            if (tabId === 'tab-settings') document.getElementById('btn-settings').classList.add('active');
+            targetPanel.classList.add('active');
+            if (targetButton) targetButton.classList.add('active');
         }
 
         // --- 4. BROWSER SANDBOX RUNTIME MOTORS (EDGE INTEGRATION) ---
@@ -555,7 +566,7 @@
                 frame.src = input;
                 document.getElementById('urlInput').value = input;
             } else {
-                // Route query strings straight through Microsoft Edge (Bing search parsing structures)
+                // Route query string terms straight to Edge/Bing framework nodes
                 const searchQuery = encodeURIComponent(input);
                 frame.src = `https://www.bing.com/search?q=${searchQuery}`;
             }
@@ -576,13 +587,13 @@
         let ActiveTheme = localStorage.getItem('user_workspace_palette_theme') || 'default';
         if (ActiveTheme !== 'default') {
             document.documentElement.setAttribute('data-theme', ActiveTheme);
-            // Re-match theme dots state highlighting on boot
             setTimeout(() => {
                 const dots = document.querySelectorAll('.theme-dot');
                 dots.forEach(d => d.classList.remove('active'));
                 if(ActiveTheme === 'matrix') dots[1].classList.add('active');
                 if(ActiveTheme === 'crimson') dots[2].classList.add('active');
-                if(ActiveTheme === 'light') dots[3].classList.add('active');
+                if(ActiveTheme === 'yellow') dots[3].classList.add('active');
+                if(ActiveTheme === 'light') dots[4].classList.add('active');
             }, 100);
         }
 
@@ -605,7 +616,6 @@
             dynamicDirectory.forEach((site, index) => {
                 const card = document.createElement('div');
                 card.className = 'site-card';
-                // Only load link context if editing deletions are closed
                 card.setAttribute('onclick', `if(!isEditingMode) loadExternal('${site.url}')`);
 
                 card.innerHTML = `
@@ -623,7 +633,7 @@
                 panel.classList.remove('editing');
             }
         }
-        renderDirectoryGrid(); // Run inventory loader on startup parameters
+        renderDirectoryGrid();
 
         function addCustomDirectoryCard() {
             const titleInput = document.getElementById('newSiteTitle');
@@ -644,7 +654,6 @@
             dynamicDirectory.push({ title: title, url: url, desc: desc });
             localStorage.setItem('user_custom_directory_cards', JSON.stringify(dynamicDirectory));
             
-            // Clean interface text values
             titleInput.value = ''; urlInput.value = ''; descInput.value = '';
             renderDirectoryGrid();
             alert(`"${title}" appended successfully inside persistent records data logs.`);
@@ -663,7 +672,7 @@
                 btn.textContent = "Exit Edit Mode";
                 btn.style.background = "rgba(255,77,77,0.15)";
                 document.getElementById('directoryHeading').textContent = "Modify Resource Index (Click Delete to Drop)";
-                switchTab('tab-websites'); // View mutations in real-time
+                switchTab('tab-websites');
             } else {
                 btn.textContent = "Edit Layout List";
                 btn.style.background = "rgba(255,255,255,0.05)";
