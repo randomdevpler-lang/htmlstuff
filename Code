@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>| coolico.client |</title>
+    <title>| Ｅｌｕｘ  |</title>
     <style>
         /* CSS Variable Architecture for Live Theme Switching */
         :root {
@@ -362,10 +362,10 @@
         
         <nav class="sidebar">
             <div class="sidebar-top">
-                <h2>coolico.client</h2>
+                <h2>Ｅｌｕｘ</h2>
                 <button class="nav-btn" id="btn-websites" onclick="switchTab('tab-websites')">Websites</button>
                 <button class="nav-btn" id="btn-opener" onclick="switchTab('tab-opener')">Web Sandbox</button>
-                <button class="nav-btn" id="btn-chat" onclick="switchTab('tab-chat')">CoolicoGPT</button>
+                <button class="nav-btn" id="btn-chat" onclick="switchTab('tab-chat')">EluxGPT</button>
             </div>
             
             <div class="sidebar-bottom">
@@ -376,7 +376,7 @@
         <main class="main-content">
             
             <div id="tab-websites" class="panel">
-                <h3 id="directoryHeading">Resource Directory</h3>
+                <h3 id="directoryHeading">Websites</h3>
                 <div class="card-grid" id="directoryGrid">
                     </div>
             </div>
@@ -403,7 +403,7 @@
             </div>
 
             <div id="tab-chat" class="panel">
-                <h3>CoolicoGPT</h3>
+                <h3>EluxGPT</h3>
                 <div class="chat-container">
                     <div class="chat-header">
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -417,7 +417,7 @@
                         </div>
                     </div>
                     <div class="chat-messages" id="chatMessages">
-                        <div class="message ai" id="welcomeMsg">Hello! Configuration engine setup complete. Supply an API authentication key token above to run active cloud inferences.</div>
+                        <div class="message ai" id="welcomeMsg">Welcome to EluxGPT, To start using the AI, please get a API key from groq and paste it above.</div>
                     </div>
                     <div class="chat-input-bar">
                         <input type="text" id="chatInput" class="chat-input" placeholder="Ask Groq something..." onkeydown="if(event.key === 'Enter') sendChatMessage()">
@@ -443,7 +443,7 @@
                     </div>
 
                     <div class="settings-box">
-                        <h4>Manage Resource Links</h4>
+                        <h4>Manage Links</h4>
                         <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Inject custom portals or clear index components dynamically.</p>
                         
                         <input type="text" id="newSiteTitle" class="form-input" placeholder="Website Name (e.g., Poki Games)">
@@ -469,10 +469,10 @@
     <script>
         // --- 1. INITIAL DIRECTORY DATA ARRAYS ---
         const baselineDirectories = [
-            { title: "Poki Games 🎮", url: "https://poki.com", desc: "Launch the standard web-native game library frame directory directly here." },
-            { title: "Wikipedia", url: "https://www.wikipedia.org", desc: "Open encyclopedia containing millions of reference documents." },
-            { title: "Project Gutenberg", url: "https://www.gutenberg.org", desc: "An archive library of over 70,000 free digital open books." },
-            { title: "Internet Archive", url: "https://archive.org", desc: "Massive public backup indexing millions of legacy files." }
+            { title: "Poki Games", url: "https://poki.com", desc: "Launch the standard web-native game library frame directory directly here. Broken or blocked." },
+            { title: "Duck Mathuniy", url: "https://duck.mathunity.org", desc: "A fun and unblocked website. Over 100 games to play. Unknown, Maybe working" },
+            { title: "Cool Math Games", url: "https://www.coolmathgames.com/", desc: "An game library basicly, LOL" },
+            { title: "Slow Roads IO", url: "https://slowroads.io/", desc: "Simple but fun car game." }
         ];
 
         let dynamicDirectory = JSON.parse(localStorage.getItem('user_custom_directory_cards')) || baselineDirectories;
