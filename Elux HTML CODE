@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>| Ｅｌｕｘ  |</title>
     <style>
+
+        #tab-vpn {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
         /* CSS Variable Architecture for Live Theme Switching */
         :root {
             --bg-color: #050508;
@@ -105,6 +112,57 @@
             height: 100%;
             z-index: 1;
         }
+
+        /* VPN STUFF START */
+
+.vpn-toggle-row {
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    background: rgba(0,0,0,0.2); 
+    padding: 15px 20px; 
+    border-radius: 8px;
+}
+.vpn-toggle-text {
+    font-size: 0.95rem; 
+    font-weight: 500;
+}
+.vpn-switch-container {
+    position: relative; 
+    display: inline-block; 
+    width: 50px; 
+    height: 26px; 
+    cursor: pointer;
+}
+.vpn-switch-container input {
+    opacity: 0; 
+    width: 100%; 
+    height: 100%; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    z-index: 2; 
+    cursor: pointer;
+}
+#sliderTrack {
+    position: absolute; 
+    top: 0; left: 0; right: 0; bottom: 0; 
+    background-color: #ff4d4d; 
+    border-radius: 34px; 
+    transition: 0.3s;
+}
+#sliderKnob {
+    position: absolute; 
+    height: 18px; 
+    width: 18px; 
+    left: 4px; 
+    bottom: 4px; 
+    background-color: white; 
+    border-radius: 50%; 
+    transition: 0.3s;
+}
+
+        /* VPN STUFF END */
 
         .app-container {
             position: relative;
@@ -356,6 +414,10 @@
 </head>
 <body>
 
+
+
+</main>
+
     <canvas id="plexusCanvas"></canvas>
 
     <div class="app-container">
@@ -366,6 +428,7 @@
                 <button class="nav-btn" id="btn-websites" onclick="switchTab('tab-websites')">Websites</button>
                 <button class="nav-btn" id="btn-opener" onclick="switchTab('tab-opener')">Web Sandbox</button>
                 <button class="nav-btn" id="btn-chat" onclick="switchTab('tab-chat')">EluxGPT</button>
+                <button class="nav-btn" id="btn-vpn" onclick="document.querySelectorAll('.main-content .panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.sidebar .nav-btn').forEach(b=>b.classList.remove('active')); document.getElementById('tab-vpn').classList.add('active'); this.classList.add('active');">VPN Proxy</button>
             </div>
             
             <div class="sidebar-bottom">
@@ -373,6 +436,16 @@
             </div>
         </nav>
 
+<div id="gatekeeper" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.4s ease, visibility 0.4s ease; color: #fff; font-family: 'Segoe UI', sans-serif;">
+    <div style="background: rgba(20, 20, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 40px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+        <h2 style="margin-bottom:10px; font-weight:600; letter-spacing:1px;">Purchase to unlock elux.</h2>
+        <p style="font-size:0.85rem; color: rgba(255,255,255,0.6); margin-bottom:25px;">To purchase, you must pay liam 1$ to get the code.</p>
+        <input type="password" id="gatewayInput" placeholder="Enter custom passkey..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 6px; margin-top: 10px; outline: none; text-align:center; margin-bottom: 20px;" onkeydown="if(event.key === 'Enter') verifyDeveloperKey()">
+        <button style="width:100%; padding: 12px; background:#aec6cf; color:#000; font-weight:600; border:none; border-radius:6px; cursor:pointer;" onclick="verifyDeveloperKey()">
+            Verify Access Key
+        </button>
+    </div>
+</div>
         <main class="main-content">
             
             <div id="tab-websites" class="panel">
@@ -384,10 +457,11 @@
             <div id="tab-opener" class="panel">
                 <div class="workspace-split">
                     <div class="browser-container">
-                        <div class="browser-toolbar">
-                            <input type="text" id="urlInput" class="url-input" value="https://poki.com" onkeydown="if(event.key === 'Enter') navigateFrame()">
-                            <button class="toolbar-btn" onclick="navigateFrame()">Launch Window</button>
-                        </div>
+                  <div class="browser-toolbar">
+                   <input type="text" id="urlInput" class="url-input" value="https://poki.com" onkeydown="if(event.key === 'Enter') navigateFrame()">
+                   <button class="toolbar-btn" onclick="navigateFrame()">Search</button>
+                   <button class="toolbar-btn" id="fsToggleBtn" onclick="toggleBrowserFullscreen()" style="background: rgba(255,255,255,0.08); padding: 8px 12px;">Fullscreen</button>
+                 </div>
                         <iframe id="sandboxFrame" class="browser-frame" src="about:blank"></iframe>
                     </div>
 
@@ -466,7 +540,47 @@
         </main>
     </div>
 
+
+
+
+
     <script>
+
+
+
+        // --- ELUX SECURITY GATEKEEPER SYSTEM ---
+const MASTER_DEVELOPER_KEY = "Elux_SecretKey";
+
+function checkGatekeeperStatus() {
+    const savedKeyState = localStorage.getItem('elux_access_granted');
+    const gate = document.getElementById('gatekeeper');
+    if (savedKeyState === 'true') {
+        gate.style.opacity = '0';
+        gate.style.visibility = 'hidden';
+    } else {
+        gate.style.opacity = '1';
+        gate.style.visibility = 'visible';
+    }
+}
+
+function verifyDeveloperKey() {
+    const inputField = document.getElementById('gatewayInput');
+    if (inputField.value.trim() === MASTER_DEVELOPER_KEY) {
+        localStorage.setItem('elux_access_granted', 'true');
+        checkGatekeeperStatus();
+        inputField.value = '';
+    } else {
+        alert("Invalid Code, Access Denied.");
+        inputField.value = '';
+        inputField.focus();
+    }
+}
+
+// Automatically check key status as soon as the file loads
+checkGatekeeperStatus();
+
+
+
         // --- 1. INITIAL DIRECTORY DATA ARRAYS ---
         const baselineDirectories = [
             { title: "Poki Games", url: "https://poki.com", desc: "Launch the standard web-native game library frame directory directly here. Broken or blocked." },
@@ -530,31 +644,39 @@
         animate();
 
         // --- 3. DYNAMIC TAB INTERFACE MANAGEMENT (WITH DOUBLE-CLICK TOGGLE TO CLOSE) ---
-        function switchTab(tabId) {
-            const targetPanel = document.getElementById(tabId);
-            const targetButton = document.getElementById(
-                tabId === 'tab-websites' ? 'btn-websites' :
-                tabId === 'tab-opener' ? 'btn-opener' :
-                tabId === 'tab-chat' ? 'btn-chat' : 'btn-settings'
-            );
 
-            // If the clicked panel is already active, turn it off completely (Toggle away)
-            if (targetPanel.classList.contains('active')) {
-                targetPanel.classList.remove('active');
-                if (targetButton) targetButton.classList.remove('active');
-                return;
-            }
+function switchTab(tabId) {
+    const targetPanel = document.getElementById(tabId);
+    let targetButton = null;
 
-            // Otherwise, clear old views and load the target selection cleanly
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            targetPanel.classList.add('active');
-            if (targetButton) targetButton.classList.add('active');
-        }
+    // Use a clean switch matrix to map buttons to tabs without messy else-ifs
+    switch (tabId) {
+        case 'tab-websites': targetButton = document.getElementById('btn-websites'); break;
+        case 'tab-opener':   targetButton = document.getElementById('btn-opener');   break;
+        case 'tab-chat':     targetButton = document.getElementById('btn-chat');     break;
+        case 'tab-vpn':      targetButton = document.getElementById('btn-vpn');      break;
+        case 'tab-settings': targetButton = document.getElementById('btn-settings'); break;
+    }
+
+    // Toggle panel off if clicked while already open
+    if (targetPanel && targetPanel.classList.contains('active')) {
+        targetPanel.classList.remove('active');
+        if (targetButton) targetButton.classList.remove('active');
+        return;
+    }
+
+    // Hide all existing open tabs and deactivate side buttons
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    
+    // Fire up the new target window view
+    if (targetPanel) targetPanel.classList.add('active');
+    if (targetButton) targetButton.classList.add('active');
+}
 
         // --- 4. BROWSER SANDBOX RUNTIME MOTORS (EDGE INTEGRATION) ---
         function navigateFrame() {
+
             let input = document.getElementById('urlInput').value.trim();
             const frame = document.getElementById('sandboxFrame');
             if (!input) return;
@@ -571,7 +693,32 @@
                 frame.src = `https://www.bing.com/search?q=${searchQuery}`;
             }
         }
+function toggleBrowserFullscreen() {
+    const iframe = document.getElementById('sandboxFrame');
 
+    
+    if (!iframe) {
+        console.error("Could not find the sandbox frame!");
+        return;
+    }
+
+    // Check if the browser is already in fullscreen mode
+    if (!document.fullscreenElement) {
+        // Force the iframe into native browser fullscreen
+        if (iframe.requestFullscreen) {
+            iframe.requestFullscreen();
+        } else if (iframe.webkitRequestFullscreen) { /* Safari support */
+            iframe.webkitRequestFullscreen();
+        } else if (iframe.msRequestFullscreen) { /* IE11 support */
+            iframe.msRequestFullscreen();
+        }
+    } else {
+        // Exit fullscreen if it's already open
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
         function loadExternal(url) {
             document.getElementById('urlInput').value = url;
             switchTab('tab-opener');
@@ -773,7 +920,13 @@
                 }, 500);
             }
             chatMessages.scrollTop = chatMessages.scrollHeight;
+
+
         }
+
+
+
+
     </script>
 </body>
 </html>
